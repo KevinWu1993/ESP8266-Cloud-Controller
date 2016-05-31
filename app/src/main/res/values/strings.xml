@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">云智能插座</string>
-    <string name="action_settings">设置设备id</string>
+    <string name="app_name">云智能插线板</string>
+    <string name="action_settings">设备设置</string>
 </resources>
