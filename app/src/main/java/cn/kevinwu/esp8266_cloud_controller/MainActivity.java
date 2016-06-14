@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import cn.kevinwu.esp8266_cloud_controller.config.SPStaticKey;
+import cn.kevinwu.esp8266_cloud_controller.config.Setting;
 import cn.kevinwu.esp8266_cloud_controller.ui.MainControllerFG;
 import cn.kevinwu.esp8266_cloud_controller.util.common.SPUtil;
 
@@ -38,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem item=menu.findItem(R.id.action_settings);
+        if(Setting.chipId==null||Setting.chipId.equals("")||Setting.chipId.equals("null")
+                ||Setting.appid==null||Setting.appid.equals("")||Setting.appid.equals("null")){
+           item.setTitle("设置设备ID");
+        }else{
+            item.setTitle("更新设备ID");
+        }
+
         return true;
     }
 
@@ -63,16 +72,22 @@ public class MainActivity extends AppCompatActivity {
                 null);
         final EditText et = (EditText) view.findViewById(R.id.editText);
         final EditText et2 = (EditText) view.findViewById(R.id.editText2);
+        if(Setting.chipId!=null||!Setting.chipId.equals("")||!Setting.chipId.equals("null")
+                ||Setting.appid!=null||!Setting.appid.equals("")||!Setting.appid.equals("null")){
+            et.setText(Setting.chipId);
+            et2.setText(Setting.appid);
+        }
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("设置设备id")
+                .setTitle("设置ID")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String strChipid=et.getText().toString();
-                        String strAppid=et2.getText().toString();
-                        SPUtil.put(MyApplication.AppContext, SPStaticKey.PLUS_SP_FILE,SPStaticKey.CHIPID,strChipid);
-                        SPUtil.put(MyApplication.AppContext, SPStaticKey.PLUS_SP_FILE,SPStaticKey.APPID,strAppid);
-
+                        if(!et.getText().toString().equals("")&&!et2.getText().toString().equals("")){
+                            String strChipid=et.getText().toString();
+                            String strAppid=et2.getText().toString();
+                            SPUtil.put(MyApplication.AppContext, SPStaticKey.PLUS_SP_FILE,SPStaticKey.CHIPID,strChipid);
+                            SPUtil.put(MyApplication.AppContext, SPStaticKey.PLUS_SP_FILE,SPStaticKey.APPID,strAppid);
+                        }
                     }
                 }).setNegativeButton("返回", new DialogInterface.OnClickListener() {
                     @Override

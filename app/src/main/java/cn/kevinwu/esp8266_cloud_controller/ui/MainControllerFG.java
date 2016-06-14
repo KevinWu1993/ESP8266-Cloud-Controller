@@ -112,6 +112,7 @@ public class MainControllerFG extends Fragment {
      * 设置开关按钮的状态
      */
     private void setTogglebtnAndText() {
+        Log.d(TAG,"执行状态提示文字设置");
         if(Setting.chipId==null||Setting.chipId.equals("")||Setting.chipId.equals("null")
                 ||Setting.appid==null||Setting.appid.equals("")||Setting.appid.equals("null")){
             lockBtn();
@@ -135,7 +136,7 @@ public class MainControllerFG extends Fragment {
         }else{
             lockBtn();
             ioTogglebtn.setChecked(true);
-            statusText.setText("无网络链接到插座，无法检测智能插座状态");
+            statusText.setText("智能插座状态：未连接");
         }
         statusText.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
@@ -162,11 +163,13 @@ public class MainControllerFG extends Fragment {
         MyNet.get(url)
                 .enqueue(new JsonCallback<GPIOStatusRTBean>() {
                     @Override
-                    public void onSuccess(final GPIOStatusRTBean entity, int responseCode, Headers headers) {
+                    public void onSuccess(final GPIOStatusRTBean entity, final int responseCode, Headers headers) {
+                        Log.d(TAG,"网络访问成功");
+                        Log.d(TAG,"状态码为"+responseCode);
                         handle.post(new Runnable() {
                             @Override
                             public void run() {
-                                if(entity.getResult()!=null){
+                                if(entity.getResult()!=null&&responseCode==200){
                                     try {
                                         String result=URLEncoder.encode (entity.getResult(), "UTF-8" );
                                         Log.d(TAG,result);
@@ -181,6 +184,9 @@ public class MainControllerFG extends Fragment {
                                         setTogglebtnAndText();
                                     }
 
+                                }else if(responseCode==502){
+                                    io14_Status=2;
+                                    setTogglebtnAndText();
                                 }
                             }
                         });
@@ -208,26 +214,6 @@ public class MainControllerFG extends Fragment {
                         handle.post(new Runnable() {
                             @Override
                             public void run() {
-//                                if(entity.getResult()!=null){
-//                                    try {
-//                                        String result=URLEncoder.encode (entity.getResult(), "UTF-8" );
-//                                        Log.d(TAG,"--"+io14_Status);
-//                                        Log.d(TAG,result);
-//                                        if(Integer.parseInt(result.split("%")[1])==0){
-//                                            io14_Status=1;
-//                                        }else{
-//                                            io14_Status=0;
-//                                        }
-//                                        Log.d(TAG,"--"+io14_Status);
-//                                        setTogglebtnAndText();
-//                                    } catch (UnsupportedEncodingException e) {
-//                                        e.printStackTrace();
-//                                        io14_Status=-1;
-//                                        setTogglebtnAndText();
-//                                    }
-//
-//                                }
-                                //直接再获取一次状态
                                 getStatus();
                             }
                         });
